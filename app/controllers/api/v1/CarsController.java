@@ -2,7 +2,6 @@ package controllers.api.v1;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import models.Car;
-import play.Logger;
 import play.data.Form;
 import play.data.FormFactory;
 import play.libs.Json;
@@ -13,14 +12,9 @@ import java.util.*;
 
 public class CarsController extends Controller {
     @Inject
-    FormFactory formFactory;
+    private FormFactory formFactory;
 
     private static final Map<Long, Car> carsRepository = new HashMap<>();
-    static {
-        carsRepository.put(
-                1L,
-                new Car(1, 1, "Punto", 2008, "Vermelho"));
-    }
 
     public Result index() {
         List<Car> carsList = new ArrayList<>(carsRepository.values());
@@ -36,40 +30,39 @@ public class CarsController extends Controller {
     }
 
     public Result create() {
-        Form<Car> carForm = formFactory.form(Car.class);
-        Car car = carForm.bindFromRequest().get();
+        Car car = getRequestCar();
 
         List<Long> indexes = new ArrayList<>(carsRepository.keySet());
         Collections.sort(indexes);
 
-        Long id = 0L;
+        Long id = 1L;
         if (!indexes.isEmpty()) {
             id = indexes.get(indexes.size() - 1) + 1;
         }
 
         car.setId(id);
-
         carsRepository.put(id, car);
-        List<Car> carsList = new ArrayList<>(carsRepository.values());
-        return ok(Json.toJson(carsList));
+
+        return redirect(controllers.api.v1.routes.CarsController.index());
     }
 
 
     public Result update(long id) {
-        Form<Car> carForm = formFactory.form(Car.class);
-        Car car = carForm.bindFromRequest().get();
-
+        Car car = getRequestCar();
         carsRepository.put(id, car);
-        List<Car> carsList = new ArrayList<>(carsRepository.values());
 
-        return ok(Json.toJson(carsList));
+        return redirect(controllers.api.v1.routes.CarsController.index());
     }
 
     public Result delete(long id) {
         carsRepository.remove(id);
-        List<Car> carsList = new ArrayList<>(carsRepository.values());
 
-        return ok(Json.toJson(carsList));
+        return redirect(controllers.api.v1.routes.CarsController.index());
+    }
+
+    private Car getRequestCar() {
+        Form<Car> carForm = formFactory.form(Car.class);
+        return carForm.bindFromRequest().get();
     }
 
 }

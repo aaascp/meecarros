@@ -1,0 +1,7 @@
+[0m[[0m[31merror[0m] [0m[0m/Users/andre/Documents/meecarros/conf/routes:8:1: type CarsController is not a member of package controllers[0m
+[0m[[0m[31merror[0m] [0m[0mGET     /cars               controllers.CarsController.index[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/andre/Documents/meecarros/conf/routes:8:1: type CarsController is not a member of package controllers[0m
+[0m[[0m[31merror[0m] [0m[0mGET     /cars               controllers.CarsController.index[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/andre/Documents/meecarros/conf/routes:8:1: type CarsController is not a member of package controllers[0m
+[0m[[0m[31merror[0m] [0m[0mGET     /cars               controllers.CarsController.index[0m
+[0m[[0m[31merror[0m] [0m[0mthree errors found[0m

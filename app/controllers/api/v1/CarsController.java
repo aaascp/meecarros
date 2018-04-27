@@ -1,9 +1,10 @@
 package controllers.api.v1;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import data.repositories.CarsRepository;
 import models.Car;
 import play.data.Form;
 import play.data.FormFactory;
+import play.db.jpa.Transactional;
 import play.libs.Json;
 import play.mvc.*;
 
@@ -14,48 +15,43 @@ public class CarsController extends Controller {
     @Inject
     private FormFactory formFactory;
 
-    private static final Map<Long, Car> carsRepository = new HashMap<>();
+    @Inject
+    private CarsRepository carsRepository;
 
+    @Transactional
     public Result index() {
-        List<Car> carsList = new ArrayList<>(carsRepository.values());
+        List<Car> carsList = carsRepository.selectAll();
 
         return ok(Json.toJson(carsList));
     }
 
+    @Transactional
     public Result show(long id) {
-        Car car = carsRepository.get(id);
-        JsonNode carJson = Json.toJson(car);
+        Car car = carsRepository.select(id);
 
-        return ok(carJson);
+        return ok(Json.toJson(car));
     }
 
+    @Transactional
     public Result create() {
         Car car = getRequestCar();
-
-        List<Long> indexes = new ArrayList<>(carsRepository.keySet());
-        Collections.sort(indexes);
-
-        Long id = 1L;
-        if (!indexes.isEmpty()) {
-            id = indexes.get(indexes.size() - 1) + 1;
-        }
-
-        car.setId(id);
-        carsRepository.put(id, car);
+        carsRepository.add(car);
 
         return redirect(controllers.api.v1.routes.CarsController.index());
     }
 
 
+    @Transactional
     public Result update(long id) {
         Car car = getRequestCar();
-        carsRepository.put(id, car);
+        carsRepository.update(id, car);
 
         return redirect(controllers.api.v1.routes.CarsController.index());
     }
 
+    @Transactional
     public Result delete(long id) {
-        carsRepository.remove(id);
+        carsRepository.delete(id);
 
         return redirect(controllers.api.v1.routes.CarsController.index());
     }

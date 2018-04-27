@@ -2,19 +2,20 @@ package data.repositories;
 
 import com.google.inject.ImplementedBy;
 import models.Car;
+import models.Valid;
 
 import java.util.List;
 
-@ImplementedBy(SimpleCarsRepository.class)
+@ImplementedBy(CarsWithErrorRepository.class)
 public interface CarsRepository {
 
-    Car select(Long id);
+    Valid<Car> select(Long id);
 
-    List<Car> selectAll();
+    Valid<List<Car>> selectAll();
 
-    void add(Car car);
+    void add(Valid<Car> car);
 
     void delete(long id);
 
-    void update(long id, Car car);
+    void update(long id, Valid<Car> car);
 }

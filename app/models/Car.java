@@ -13,8 +13,8 @@ public class Car {
     private static final String validColors = "branco|preto|verde";
 
     @Id
-    @GeneratedValue(generator="increment")
-    @GenericGenerator(name="increment", strategy = "increment")
+    @GeneratedValue(generator = "increment")
+    @GenericGenerator(name = "increment", strategy = "increment")
     private long id;
 
     @Column
@@ -28,12 +28,16 @@ public class Car {
 
     @Column
     @NotNull
-    @MaxAge(value=30)
+    @MaxAge(value = 30)
     private int year;
 
     @Column
     @Pattern(regexp = validColors)
     private String color;
+
+    public static String getValidColors() {
+        return validColors;
+    }
 
     public long getId() {
         return id;

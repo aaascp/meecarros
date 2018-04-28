@@ -12,11 +12,11 @@ public class CarsWithErrorRepository implements CarsRepository {
     private CarsDao carsDao;
 
     public Valid<Car> select(Long id) {
-        return Valid.getInstaceForModel(carsDao.select(id));
+        return Valid.getInstanceForModel(carsDao.select(id));
     }
 
     public Valid<List<Car>> selectAll() {
-        return Valid.getInstaceForModel(carsDao.selectAll());
+        return Valid.getInstanceForModel(carsDao.selectAll());
     }
 
     public void add(Valid<Car> car) {

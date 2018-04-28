@@ -39,7 +39,7 @@ public class CarsController extends Controller {
         carsRepository.add(car);
 
         if (!car.isValid()) {
-            return status(UNPROCESSABLE_ENTITY, car.getErrorMessage());
+            return status(UNPROCESSABLE_ENTITY, Json.toJson(car.getErrors()));
         }
 
         return redirect(controllers.api.v1.routes.CarsController.index());
@@ -52,7 +52,7 @@ public class CarsController extends Controller {
         carsRepository.update(id, car);
 
         if(!car.isValid()) {
-            return status(UNPROCESSABLE_ENTITY, car.getErrorMessage());
+            return status(UNPROCESSABLE_ENTITY, Json.toJson(car.getErrors()));
         }
 
         return redirect(controllers.api.v1.routes.CarsController.index());
@@ -66,12 +66,12 @@ public class CarsController extends Controller {
     }
 
     private Valid<Car> getRequestCar() {
+        Form<Car> carForm = formFactory.form(Car.class);
         try {
-            Form<Car> carForm = formFactory.form(Car.class);
             Car car = carForm.bindFromRequest().get();
-            return Valid.getInstaceForModel(car);
+            return Valid.getInstanceForModel(car);
         } catch (IllegalStateException exception) {
-            return Valid.getInstaceForError(exception.getMessage());
+            return Valid.getInstanceForError(carForm.allErrors());
         }
     }
 }

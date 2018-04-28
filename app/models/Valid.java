@@ -1,37 +1,37 @@
 package models;
 
-import utils.StringUtils;
+import java.util.List;
 
 public class Valid<T> {
     private T model;
-    private String errorMessage;
+    private List<?> errors;
 
-    private Valid(T model, String errorMessage) {
+    private Valid(T model, List<?> errors) {
         this.model = model;
-        this.errorMessage = errorMessage;
+        this.errors = errors;
     }
 
-    public static <T> Valid<T> getInstaceForModel(T model) {
-        return new Valid<>(model, "");
+    public static <T> Valid<T> getInstanceForModel(T model) {
+        return new Valid<>(model, null);
     }
 
-    public static <T> Valid<T> getInstaceForError(String errorMessage) {
-        return new Valid<>(null, errorMessage);
+    public static <T> Valid<T> getInstanceForError(List<?> errors) {
+        return new Valid<>(null, errors);
     }
 
     public T getModel() {
         return model;
     }
 
-    public String getErrorMessage() {
-        return errorMessage;
+    public List<?> getErrors() {
+        return errors;
     }
 
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
+    public void setErrors(List<?> errors) {
+        this.errors = errors;
     }
 
     public boolean isValid() {
-        return !StringUtils.isEmptyOrNull(errorMessage);
+        return errors == null;
     }
 }

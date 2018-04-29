@@ -1,5 +1,7 @@
-package models.validators;
+package models.validators.annotations;
 
+
+import models.validators.MaxAgeValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

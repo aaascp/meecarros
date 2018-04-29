@@ -1,6 +1,7 @@
-package data.dao;
+package data.dao.cars;
 
 import models.Car;
+import play.Logger;
 import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
@@ -13,6 +14,21 @@ public class DbCarsDao implements CarsDao {
     @Inject
     JPAApi jpaApi;
 
+    public long getLastId() {
+        return jpaApi.withTransaction(entityManager -> {
+            String sql = "select max(car.id) from Car car";
+            EntityManager em = jpaApi.em();
+            Object maxId = em.createQuery(sql).getSingleResult();
+            if (maxId != null) {
+                return (Long) maxId;
+            } else {
+                return 0L;
+            }
+        });
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public int size() {
         return jpaApi.withTransaction(entityManager -> {
             String sql = "select count(*) from Car";
@@ -26,23 +42,37 @@ public class DbCarsDao implements CarsDao {
         });
     }
 
-    public Car select(Long id) {
+    @Override
+    public Car find(long id) {
         return jpaApi.withTransaction(entityManager ->
                 entityManager.find(Car.class, id));
     }
 
-    public List<Car> selectRange(int offset, int limit) {
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Car> select(
+            long offset,
+            int limit,
+            OrderBy orderBy) {
+
+        String comparator = orderBy == OrderBy.DESC ? "<=" : ">=";
+
         return jpaApi.withTransaction(entityManager -> {
-            String sql = "from Car as c order by c.id desc";
+            String sql = "FROM Car as c WHERE c.id " +
+                    comparator + " " + offset +
+                    " ORDER BY c.id " + orderBy;
             EntityManager em = jpaApi.em();
             Query query = em.createQuery(sql)
-                    .setFirstResult(offset)
                     .setMaxResults(limit);
+
+//            query.setParameter("orderBy", orderBy.getValue());
+//            query.setParameter("offset", offset);
             List<Car> carsList = query.getResultList();
             return carsList;
         });
     }
 
+    @Override
     public long add(Car car) {
         jpaApi.withTransaction(() -> {
             EntityManager em = jpaApi.em();
@@ -51,6 +81,7 @@ public class DbCarsDao implements CarsDao {
         return car.getId();
     }
 
+    @Override
     public void delete(long id) {
         jpaApi.withTransaction(() -> {
             EntityManager entityManager = jpaApi.em();
@@ -61,6 +92,7 @@ public class DbCarsDao implements CarsDao {
         });
     }
 
+    @Override
     public void update(long id, Car car) {
         jpaApi.withTransaction(() -> {
             EntityManager em = jpaApi.em();

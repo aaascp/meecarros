@@ -1,7 +1,6 @@
 package models;
 
-import models.validators.MaxAge;
-import org.hibernate.annotations.GenericGenerator;
+import models.validators.annotations.MaxAge;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
@@ -9,13 +8,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 @Entity
-public class Car {
+public class Car extends ModelEntity {
     private static final String validColors = "branco|preto|verde";
-
-    @Id
-    @GeneratedValue(generator = "increment")
-    @GenericGenerator(name = "increment", strategy = "increment")
-    private long id;
 
     @Column
     @NotNull
@@ -37,14 +31,6 @@ public class Car {
 
     public static String getValidColors() {
         return validColors;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public long getUserId() {

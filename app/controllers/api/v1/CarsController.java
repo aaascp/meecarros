@@ -1,17 +1,20 @@
 package controllers.api.v1;
 
-import data.repositories.CarsRepository;
+import controllers.annotations.paged.LinkHeaderHelper;
+import controllers.annotations.paged.Paged;
+import data.dao.cars.CarsDao;
+import data.repositories.cars.CarsRepository;
 import models.Car;
-import models.Valid;
 import play.data.Form;
 import play.data.FormFactory;
 import play.db.jpa.Transactional;
 import play.libs.Json;
 import play.mvc.*;
-import utils.LinkHeaderHelper;
 
 import javax.inject.Inject;
 import java.util.*;
+
+import static controllers.annotations.paged.PagedActionAnnotation.LINK_HEADER_HELPER_TAG;
 
 public class CarsController extends Controller {
     @Inject
@@ -20,101 +23,71 @@ public class CarsController extends Controller {
     @Inject
     private CarsRepository carsRepository;
 
-    private static final int DEFAULT_ADJUSTMENT = 0;
-    private static final int DEFAULT_OFFSET = 0;
-    private static final int DEFAULT_LIMIT = 5;
-    private static final int MAX_LIMIT = 100;
-
     @Transactional
+    @Paged(CarsRepository.class)
     public Result index() {
-        LinkHeaderHelper linkHelper =
-                new LinkHeaderHelper(
-                        request().host(),
-                        request().path(),
-                        request().secure());
 
-        int adjustment = parseInt(
-                request().getQueryString("adjustment"),
-                DEFAULT_ADJUSTMENT);
+        LinkHeaderHelper linkHeaderHelper =
+                (LinkHeaderHelper) ctx().args.get(LINK_HEADER_HELPER_TAG);
 
-        int offset = parseInt(
-                request().getQueryString("offset"),
-                DEFAULT_OFFSET);
+        long offset = linkHeaderHelper.getOffset();
+        int limit = linkHeaderHelper.getLimit();
 
-        int limit = parseInt(
-                request().getQueryString("limit"),
-                DEFAULT_LIMIT);
+        List<Car> carsList =
+                carsRepository.select(offset, limit, CarsDao.OrderBy.DESC);
 
-        limit = limit < MAX_LIMIT ? limit : MAX_LIMIT;
-        Valid<List<Car>> carsList =
-                carsRepository.selectRange(
-                        offset + adjustment,
-                        limit);
-
-        return ok(Json.toJson(carsList.getModel()))
-                .withHeader(
-                        "Link",
-                        linkHelper.getLinkHeader(
-                                carsRepository.size(),
-                                offset + adjustment,
-                                limit
-                        ));
+        return ok(Json.toJson(carsList));
     }
 
     @Transactional
     public Result show(long id) {
-        Valid<Car> car = carsRepository.select(id);
+        Car car = carsRepository.find(id);
 
-        return ok(Json.toJson(car.getModel()));
+        return ok(Json.toJson(car));
     }
 
     @Transactional
+    @Paged(CarsRepository.class)
     public Result create() {
-        Valid<Car> car = getRequestCar();
-        long id = carsRepository.add(car);
+        Optional<Car> car = getRequestCar();
 
-        if (!car.isValid()) {
-            return status(UNPROCESSABLE_ENTITY, Json.toJson(car.getErrors()));
+        if (!car.isPresent()) {
+            return status(UNPROCESSABLE_ENTITY);
         }
 
+        long id = carsRepository.add(car.get());
         return redirect(controllers.api.v1.routes.CarsController.show(id));
     }
 
 
     @Transactional
     public Result update(long id) {
-        Valid<Car> car = getRequestCar();
-        carsRepository.update(id, car);
+        Optional<Car> car = getRequestCar();
 
-        if (!car.isValid()) {
-            return status(UNPROCESSABLE_ENTITY, Json.toJson(car.getErrors()));
+        if (!car.isPresent()) {
+            return status(UNPROCESSABLE_ENTITY);
         }
 
+        carsRepository.update(id, car.get());
         return redirect(controllers.api.v1.routes.CarsController.show(id));
     }
 
     @Transactional
+    @Paged(CarsRepository.class)
     public Result delete(long id) {
         carsRepository.delete(id);
 
         return ok();
     }
 
-    private Valid<Car> getRequestCar() {
+    private Optional<Car> getRequestCar() {
         Form<Car> carForm = formFactory.form(Car.class);
         try {
             Car car = carForm.bindFromRequest().get();
-            return Valid.getInstanceForModel(car);
+            return Optional.of(car);
         } catch (IllegalStateException exception) {
-            return Valid.getInstanceForError(carForm.allErrors());
+            return Optional.empty();
         }
     }
 
-    private int parseInt(String value, int defaultValue) {
-        try {
-            return Integer.parseInt(value);
-        } catch (Exception ignored) {
-            return defaultValue;
-        }
-    }
 }

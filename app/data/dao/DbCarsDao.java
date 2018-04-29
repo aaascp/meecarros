@@ -1,7 +1,6 @@
 package data.dao;
 
 import models.Car;
-import play.Logger;
 import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
@@ -14,26 +13,42 @@ public class DbCarsDao implements CarsDao {
     @Inject
     JPAApi jpaApi;
 
+    public int size() {
+        return jpaApi.withTransaction(entityManager -> {
+            String sql = "select count(*) from Car";
+            EntityManager em = jpaApi.em();
+            List<Long> count = em.createQuery(sql).getResultList();
+            if (count != null) {
+                return count.get(0).intValue();
+            } else {
+                return 0;
+            }
+        });
+    }
+
     public Car select(Long id) {
         return jpaApi.withTransaction(entityManager ->
                 entityManager.find(Car.class, id));
     }
 
-    public List<Car> selectAll() {
+    public List<Car> selectRange(int offset, int limit) {
         return jpaApi.withTransaction(entityManager -> {
-            String sql = "from Car";
+            String sql = "from Car as c order by c.id desc";
             EntityManager em = jpaApi.em();
-            Query query = em.createQuery(sql);
-            return (List<Car>) query.getResultList();
+            Query query = em.createQuery(sql)
+                    .setFirstResult(offset)
+                    .setMaxResults(limit);
+            List<Car> carsList = query.getResultList();
+            return carsList;
         });
     }
 
-
-    public void add(Car car) {
+    public long add(Car car) {
         jpaApi.withTransaction(() -> {
             EntityManager em = jpaApi.em();
             em.persist(car);
         });
+        return car.getId();
     }
 
     public void delete(long id) {

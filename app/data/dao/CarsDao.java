@@ -8,11 +8,13 @@ import java.util.List;
 @ImplementedBy(DbCarsDao.class)
 public interface CarsDao {
 
+    int size();
+
     Car select(Long id);
 
-    List<Car> selectAll();
+    List<Car> selectRange(int offset, int limit);
 
-    void add(Car car);
+    long add(Car car);
 
     void delete(long id);
 

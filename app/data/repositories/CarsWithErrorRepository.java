@@ -11,18 +11,23 @@ public class CarsWithErrorRepository implements CarsRepository {
     @Inject
     private CarsDao carsDao;
 
+    public int size() {
+        return carsDao.size();
+    }
+
     public Valid<Car> select(Long id) {
         return Valid.getInstanceForModel(carsDao.select(id));
     }
 
-    public Valid<List<Car>> selectAll() {
-        return Valid.getInstanceForModel(carsDao.selectAll());
+    public Valid<List<Car>> selectRange(int offset, int limit) {
+        return Valid.getInstanceForModel(
+                carsDao.selectRange(
+                        offset,
+                        limit));
     }
 
-    public void add(Valid<Car> car) {
-        if (car.isValid()) {
-            carsDao.add(car.getModel());
-        }
+    public long add(Valid<Car> car) {
+        return carsDao.add(car.getModel());
     }
 
     public void delete(long id) {
@@ -30,8 +35,7 @@ public class CarsWithErrorRepository implements CarsRepository {
     }
 
     public void update(long id, Valid<Car> car) {
-        if (car.isValid()) {
-            carsDao.update(id, car.getModel());
-        }
+        carsDao.update(id, car.getModel());
+
     }
 }

@@ -9,11 +9,13 @@ import java.util.List;
 @ImplementedBy(CarsWithErrorRepository.class)
 public interface CarsRepository {
 
+    int size();
+
     Valid<Car> select(Long id);
 
-    Valid<List<Car>> selectAll();
+    Valid<List<Car>> selectRange(int offset, int limit);
 
-    void add(Valid<Car> car);
+    long add(Valid<Car> car);
 
     void delete(long id);
 

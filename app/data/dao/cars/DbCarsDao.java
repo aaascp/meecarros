@@ -94,6 +94,7 @@ public class DbCarsDao implements CarsDao {
 
     @Override
     public void update(long id, Car car) {
+        car.setId(id);
         jpaApi.withTransaction(() -> {
             EntityManager em = jpaApi.em();
             em.merge(car);

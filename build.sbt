@@ -8,6 +8,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayJava)
 scalaVersion := "2.12.4"
 
 libraryDependencies += guice
+libraryDependencies += filters
 libraryDependencies ++= Seq(
   javaJdbc,
   "org.xerial" % "sqlite-jdbc" % "3.21.0.1",

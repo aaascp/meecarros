@@ -55,8 +55,7 @@ public class LinkHeaderHelper {
         } else {
             String link =
                     String.format(
-                            "<http%s://%s%s?offset=%d&limit=%d>; rel=\"%s\"",
-                            isSecure ? "s" : "",
+                            "<https://%s%s?offset=%d&limit=%d>; rel=\"%s\"",
                             host,
                             path,
                             nextOffset,

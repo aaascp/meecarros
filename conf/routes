@@ -7,6 +7,7 @@ GET     /api/v1/cars/:id           controllers.api.v1.CarsController.show(id: Lo
 POST    /api/v1/cars               controllers.api.v1.CarsController.create
 PATCH   /api/v1/cars/:id           controllers.api.v1.CarsController.update(id: Long)
 DELETE  /api/v1/cars/:id           controllers.api.v1.CarsController.delete(id: Long)
+PUT     /api/v1/seed               controllers.api.v1.HomeController.seed
 
 
 # Map static resources from the /public folder to the /assets URL path

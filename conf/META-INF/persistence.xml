@@ -9,7 +9,6 @@
         <class>models.Car</class>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.SQLiteDialect"/>
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
         </properties>
     </persistence-unit>
 
